@@ -1,6 +1,4 @@
-# allegro_hand_ros
-
-Allegro Hand ROS
+Allegro Hand ROS Humble
 ================================
 
 This is a fork of the official release to control Allegro Hand with ROS Kinetic : [https://github.com/simlabrobotics/allegro_hand_ros_v4](https://github.com/simlabrobotics/allegro_hand_ros_v4). This repo has been heavily modified in order to :
