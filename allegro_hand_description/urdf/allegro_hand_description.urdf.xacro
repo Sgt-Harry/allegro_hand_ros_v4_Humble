@@ -1,7 +1,15 @@
 <?xml version="1.0"?>
 <robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="allegro_hand">
 
-    <xacro:macro name="allegro_hand" params="chirality parent *origin prefix ur5_attachment:=false desk_stand:=false last_links_inertia_factor=1.0">
+    <xacro:macro name="allegro_hand" params="
+        chirality:=right
+        parent
+        *origin
+        prefix
+        ur5_attachment:=false
+        desk_stand:=false
+        last_links_inertia_factor=100.0"
+        >
 
     <!-- ======================== CHIRALITY PARAMS ========================= -->
     <xacro:property name="suffix" value="${chirality}"/>
@@ -10,8 +18,8 @@
     <xacro:property name="zero_left"   value="${0 if suffix == 'left' else 1}"/>
     <xacro:property name="zero_right"  value="${0 if suffix == 'right' else 1}"/>
 
-    <xacro:if value="${minus_right * minus_left != -1}">
-    INVALID CHIRALITY, MUST BE "left" OR "right"
+    <xacro:if value="${chirality != 'left' and chirality != 'right'}">
+        INVALID CHIRALITY, MUST BE "left" OR "right"
     </xacro:if>
 
     <xacro:property name="DEG2RAD" value="0.01745329251"/>
@@ -93,8 +101,15 @@
     </link>
 
     <!-- THUMB MACRO -->
-    <xacro:macro name="thumb"
-                params="finger_num offset_origin_x offset_origin_y offset_origin_z finger_angle_r finger_angle_p finger_angle_y">
+    <xacro:macro name="thumb" params="
+        finger_num
+        offset_origin_x
+        offset_origin_y
+        offset_origin_z
+        finger_angle_r
+        finger_angle_p
+        finger_angle_y"
+        >
 
         <!-- [LINK 12] -->
         <link name="${prefix}_link_${'%02d' % (finger_num*4+0)}">
@@ -281,8 +296,13 @@
     <!-- END THUMB MACRO -->
 
     <!-- THREE FINGER MACRO -->
-    <xacro:macro name="finger"
-                params="finger_num offset_origin_x offset_origin_y offset_origin_z finger_angle_r">
+    <xacro:macro name="finger" params="
+        finger_num
+        offset_origin_x
+        offset_origin_y
+        offset_origin_z
+        finger_angle_r"
+        >
 
         <!-- [LINK 0, 4, 8] -->
         <link name="${prefix}_link_${'%02d' % (finger_num*4+0)}">
@@ -568,8 +588,7 @@
         </link>
     </xacro:if>
 
-
-<!-- ================================== ORIGIN ================================== -->
+    <!-- ================================== ORIGIN ================================== -->
     <joint name="${prefix}_base_screws_joint" type="fixed">
         <parent link="${prefix}_base_screws"/>
         <child link="${prefix}_palm_link"/>
@@ -634,6 +653,7 @@
                 <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
             </joint>
             <actuator name="${prefix}_joint_${'%02d' % joint_num}_motor">
+                <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
                 <mechanicalReduction>1</mechanicalReduction>
             </actuator>
         </transmission>
@@ -657,28 +677,31 @@
     <xacro:make_transmission joint_num="15"/>
 
     <gazebo>
-    <plugin name="${prefix}_ros_control" filename="libgazebo_ros_control_select_joints.so">
-        <robotNamespace>/${prefix}</robotNamespace>
-        <legacyModeNS>false</legacyModeNS>
-        <joints>
-            ${prefix}_joint_00
-            ${prefix}_joint_01
-            ${prefix}_joint_02
-            ${prefix}_joint_03
-            ${prefix}_joint_04
-            ${prefix}_joint_05
-            ${prefix}_joint_06
-            ${prefix}_joint_07
-            ${prefix}_joint_08
-            ${prefix}_joint_09
-            ${prefix}_joint_10
-            ${prefix}_joint_11
-            ${prefix}_joint_12
-            ${prefix}_joint_13
-            ${prefix}_joint_14
-            ${prefix}_joint_15
-        </joints>
-    </plugin>
+        <plugin name="${prefix}_ros_control" filename="libgazebo_ros2_control.so">
+            <ros>
+                <namespace>/${prefix}</namespace>
+            </ros>
+            <robotSimType>gazebo_ros2_control/DefaultRobotHWSim</robotSimType>
+            <legacyModeNS>false</legacyModeNS>
+            <joints>
+                ${prefix}_joint_00
+                ${prefix}_joint_01
+                ${prefix}_joint_02
+                ${prefix}_joint_03
+                ${prefix}_joint_04
+                ${prefix}_joint_05
+                ${prefix}_joint_06
+                ${prefix}_joint_07
+                ${prefix}_joint_08
+                ${prefix}_joint_09
+                ${prefix}_joint_10
+                ${prefix}_joint_11
+                ${prefix}_joint_12
+                ${prefix}_joint_13
+                ${prefix}_joint_14
+                ${prefix}_joint_15
+            </joints>
+        </plugin>
     </gazebo>
     </xacro:macro>
 </robot>
